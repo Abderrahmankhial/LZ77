@@ -3,6 +3,7 @@
 import os
 from tkinter import Tk
 from tkinter import filedialog
+from art import tprint
 #1. find_in_dict function is used to find the longest substring in the dictionary that matches the buffer   
 
 def find_in_dict(buffer, dictionary):
@@ -76,19 +77,51 @@ def save_file(compressed_message):
     root = Tk()
     root.withdraw()
     root.wm_attributes('-topmost', 1)
-    file=filedialog.asksaveasfilename( title="Choose the file you want to Compress", filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
+    file=filedialog.asksaveasfilename( title="Choose where you want to save the compressed text", filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
     root.update()
     root.destroy()
     open(file, "w").write(str(compressed_message))
 #4. main function is used to test the code
 if __name__ == "__main__":
-    #open the file
-    message = open_file()
-    #compress the message
-    compressed_message = compress(message, 4, 10)
-    #save the compressed message
-    save_file(compressed_message)
-    #decompress the message
-    decompressed_message = decompress(compressed_message)
-    #print the message
-    print(decompressed_message)
+    tprint("LZ77", font="block", chr_ignore=True)
+    choice=input("Do you want to compress a file or decompress a file or both? (c/d/b) ")
+    if choice=="b":
+        #open the file
+        message = open_file()
+        #compress the file
+        try:
+            buffer, dictionary = input("Enter the buffer size and the dictionary size respectively seperated by space: ").split()
+            print("buffer size: " + buffer + " dictionary size: " + dictionary)
+            compressed_message = compress(message, int(buffer), int(dictionary))
+        except:
+            print("Invalid input, using default values")
+            compressed_message = compress(message, 4, 8)
+        #save the compressed file
+        save_file(compressed_message)
+        #decompress the file
+        decompressed_message = decompress(compressed_message)
+        #print the results
+        print("Original message: " + message)
+        print("Compressed message: " + str(compressed_message))
+        print("Decompressed message: " + decompressed_message)
+        print("Are the messages equal? " + str(message == decompressed_message))
+    elif choice=="c":
+        #open the file
+        message = open_file()
+        #compress the file
+        try:
+            buffer, dictionary = input("Enter the buffer size and the dictionary size respectively: ").split()
+            compressed_message = compress(message, int(buffer), int(dictionary))
+        except:
+            print("Invalid input, using default values")
+            compressed_message = compress(message, 4, 8)
+        save_file(compressed_message)
+    elif choice=="d":
+        #open the file
+        message = open_file()
+        #decompress the file
+        decompressed_message = decompress(message)
+        #print the results
+        print("Original message: " + message)
+        print("Decompressed message: " + decompressed_message)
+        print("Are the messages equal? " + str(message == decompressed_message))

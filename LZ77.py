@@ -109,8 +109,8 @@ if __name__ == "__main__":
         #open the file
         message = open_file()
         #compress the file
-        try:
-            buffer, dictionary = input("Enter the buffer size and the dictionary size respectively: ").split()
+        try: 
+            buffer, dictionary = input("Enter the buffer size and the dictionary size respectively seperated by space: ").split()
             compressed_message = compress(message, int(buffer), int(dictionary))
         except:
             print("Invalid input, using default values")

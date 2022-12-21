@@ -68,7 +68,9 @@ def open_file():
     root = Tk()
     root.withdraw()
     root.wm_attributes('-topmost', 1)
-    file=filedialog.askopenfilename( title="Choose the file you want to Compress", filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
+    file=filedialog.askopenfilename( title="Choose the file you want ", filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
+    if file=="":
+        root.destroy()
     root.update()
     root.destroy()
     return open(file, "r").read()
@@ -78,16 +80,21 @@ def save_file(compressed_message):
     root.withdraw()
     root.wm_attributes('-topmost', 1)
     file=filedialog.asksaveasfilename( title="Choose where you want to save the compressed text", filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
+    if file=="":
+        file="output.txt"
     root.update()
     root.destroy()
     open(file, "w").write(str(compressed_message))
-#4. main function is used to test the code
+#4. main function is used to run the code
 if __name__ == "__main__":
     tprint("LZ77", font="block", chr_ignore=True)
     choice=input("Do you want to compress a file or decompress a file or both? (c/d/b) ")
     if choice=="b":
         #open the file
         message = open_file()
+        if message=="":#if the file is empty, exit the program
+            print("The file is empty")
+            exit()
         #compress the file
         try:
             buffer, dictionary = input("Enter the buffer size and the dictionary size respectively seperated by space: ").split()
@@ -97,8 +104,12 @@ if __name__ == "__main__":
             print("Invalid input, using default values")
             compressed_message = compress(message, 4, 8)
         #save the compressed file
+        
         save_file(compressed_message)
         #decompress the file
+        if compressed_message=="":#if the file is empty, exit the program
+            print("The file is empty")
+            exit()
         decompressed_message = decompress(compressed_message)
         #print the results
         print("Original message: " + message)
@@ -108,6 +119,9 @@ if __name__ == "__main__":
     elif choice=="c":
         #open the file
         message = open_file()
+        if message=="":#if the file is empty, exit the program
+            print("The file is empty")
+            exit()
         #compress the file
         try: 
             buffer, dictionary = input("Enter the buffer size and the dictionary size respectively seperated by space: ").split()
@@ -119,9 +133,14 @@ if __name__ == "__main__":
     elif choice=="d":
         #open the file
         message = open_file()
+        if message=="":
+            print("The file is empty")
+            exit()
+        #convert the string to a list
+        x=eval(message)
         #decompress the file
-        decompressed_message = decompress(message)
+        decompressed_message = decompress(x)
         #print the results
-        print("Original message: " + message)
         print("Decompressed message: " + decompressed_message)
-        print("Are the messages equal? " + str(message == decompressed_message))
+    else:
+        print("Invalid input")

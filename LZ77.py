@@ -48,19 +48,24 @@ def compress(message, buffer_size, dictionary_size):
         #add the shift, size and last character to the output
         buffer = message[:buffer_size]
         if shift != 0 or size != 0:
+            #add the shift, size and last character to the output
             output.append((shift, size, last_character))
         else:
+            #add the last character to the output if the shift and size are 0
             output.append(last_character)
     return output
 
 #3. decompress function is used to decompress the message in the LZ77 algorithm
 def decompress(compressed_message):
     message = ""
+    
     for part in compressed_message:
+        #if the part is a tuple, add the substring to the message
         if len(part)!=1:
             shift, size, character = part
             message = message + message[-shift:][:size] + character
         else:
+            #if the part is not a tuple, add the character to the message
             message += part
     return message
 #function that opens file manager top select a file with multi selection desabled
@@ -70,46 +75,55 @@ def open_file():
     root.wm_attributes('-topmost', 1)
     file=filedialog.askopenfilename( title="Choose the file you want ", filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
     if file=="":
-        root.destroy()
+        return "no file selected.error"
     root.update()
     root.destroy()
     return open(file, "r").read()
 #function that saves the compressed file
-def save_file(compressed_message):
+def save_file(compressed_message, Title , file="output.txt"):
     root = Tk()
     root.withdraw()
     root.wm_attributes('-topmost', 1)
-    file=filedialog.asksaveasfilename( title="Choose where you want to save the compressed text", filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
+    file=filedialog.asksaveasfilename( title=Title, filetypes =(("Text", "*.txt"),("All Files","*.*"),("Text", "*.txt")))
     if file=="":
         file="output.txt"
     root.update()
     root.destroy()
     open(file, "w").write(str(compressed_message))
+def select_file():
+    is_selected=False
+    while is_selected!= True:
+            message = open_file()
+            if message=="":#if the file is empty, exit the program
+                pass
+            elif len(message)>1000000:
+                pass
+            elif message=="no file selected.error":
+                pass
+            elif message!="":
+                is_selected=True
+                return message
 #4. main function is used to run the code
 if __name__ == "__main__":
-    tprint("LZ77", font="block", chr_ignore=True)
-    choice=input("Do you want to compress a file or decompress a file or both? (c/d/b) ")
+    print("\033[1;32m")#set the color of the text to green
+    tprint("LZ77", font="block", chr_ignore=True)#print the title
+    choice=input("Do you want to compress a file or decompress a file or both? (c/d/b) ")#get the choice from the user
     if choice=="b":
         #open the file
-        message = open_file()
-        if message=="":#if the file is empty, exit the program
-            print("The file is empty")
-            exit()
+        message = select_file()
         #compress the file
         try:
+            #get the buffer size and the dictionary size from the user
             buffer, dictionary = input("Enter the buffer size and the dictionary size respectively seperated by space: ").split()
             print("buffer size: " + buffer + " dictionary size: " + dictionary)
             compressed_message = compress(message, int(buffer), int(dictionary))
         except:
+            #if the user enters invalid input, use the default values
             print("Invalid input, using default values")
             compressed_message = compress(message, 4, 8)
         #save the compressed file
-        
-        save_file(compressed_message)
+        save_file(compressed_message, "Choose the file you want to save the compressed file to")
         #decompress the file
-        if compressed_message=="":#if the file is empty, exit the program
-            print("The file is empty")
-            exit()
         decompressed_message = decompress(compressed_message)
         #print the results
         print("Original message: " + message)
@@ -118,29 +132,29 @@ if __name__ == "__main__":
         print("Are the messages equal? " + str(message == decompressed_message))
     elif choice=="c":
         #open the file
-        message = open_file()
-        if message=="":#if the file is empty, exit the program
-            print("The file is empty")
-            exit()
+        message = select_file()
         #compress the file
         try: 
             buffer, dictionary = input("Enter the buffer size and the dictionary size respectively seperated by space: ").split()
+            print("buffer size: " + buffer + " dictionary size: " + dictionary)
             compressed_message = compress(message, int(buffer), int(dictionary))
         except:
             print("Invalid input, using default values")
             compressed_message = compress(message, 4, 8)
-        save_file(compressed_message)
+        save_file(compressed_message, "Save the compressed file")
     elif choice=="d":
         #open the file
-        message = open_file()
-        if message=="":
-            print("The file is empty")
-            exit()
+        message = select_file()
         #convert the string to a list
         x=eval(message)
         #decompress the file
         decompressed_message = decompress(x)
         #print the results
         print("Decompressed message: " + decompressed_message)
+        save= input("Do you want to save the decompressed message? (y/n) ")
+        if save=="y":
+            save_file(decompressed_message, "Save the decompressed file")
+        else:
+            exit()
     else:
         print("Invalid input")
